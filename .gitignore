@@ -1,20 +1,20 @@
-# Arquivos do Terraform
+# Terraform
 .terraform/
 *.tfstate
 *.tfstate.backup
+*.tfvars
 .terraform.lock.hcl
-terraform.tfvars
 
 # Python
 __pycache__/
 *.pyc
-.pytest_cache/
-venv/
 
-# Dados (Não enviar dados reais para o Git!)
-*.csv
+# Credenciais e Chaves
 *.json
-!metadata.json  # Exceção: queremos versionar o metadata do Dataflow
+!dataform.json
+!workflow_settings.yaml
+!package.json
 
-# Logs e arquivos temporários do Cloud Shell
-.config/
+# IDE / Sistema
+.DS_Store
+.vscode/

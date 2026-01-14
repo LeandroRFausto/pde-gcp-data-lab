@@ -1,81 +1,129 @@
-# --- BUCKETS GCS ---
-
-# Landing Zone (Entrada de arquivos) - Limpeza em 1 dia
-resource "google_storage_bucket" "landing" {
+# --- STORAGE (LANDING ZONE & RAW ZONE) ---
+resource "google_storage_bucket" "landing_zone" {
   name          = "${var.project_id}-landing-zone"
-  location      = var.region
-  force_destroy = true # Permite destruir bucket com arquivos dentro
-  uniform_bucket_level_access = true
-
-  lifecycle_rule {
-    condition { age = 1 }
-    action    { type = "Delete" }
-  }
-}
-
-# Raw Zone (Processamento) - Limpeza em 3 horas (Diagrama)
-resource "google_storage_bucket" "raw" {
-  name          = "${var.project_id}-raw-zone"
   location      = var.region
   force_destroy = true
   uniform_bucket_level_access = true
-
-  lifecycle_rule {
-    condition { age = 1 } # GCS aceita min de 1 dia na regra simples, usaremos 1 dia para simplificar o TF
-    action    { type = "Delete" }
-  }
-  # Nota: Para 3h exatas, precisariamos de um script externo ou Cloud Function, 
-  # mas 1 dia é suficiente para o Free Tier não cobrar quase nada.
 }
 
-# --- BIGQUERY ---
+# --- PUBSUB (STREAMING) ---
+resource "google_pubsub_topic" "iot_topic" {
+  name = "iot-readings"
+}
 
-resource "google_bigquery_dataset" "gold" {
+resource "google_pubsub_subscription" "iot_subscription" {
+  name  = "iot-readings-sub"
+  topic = google_pubsub_topic.iot_topic.name
+}
+
+# --- BIGQUERY (DATA WAREHOUSE) ---
+resource "google_bigquery_dataset" "gold_layer" {
   dataset_id                 = "gold_layer"
-  friendly_name              = "Gold Layer (EDW)"
-  description                = "Dados tratados e prontos para consumo"
-  location                   = var.region
-  delete_contents_on_destroy = true # CUIDADO: Em prod, isso seria false
-}
-
-resource "google_bigquery_dataset" "dlq" {
-  dataset_id                 = "dlq_layer"
-  friendly_name              = "Dead Letter Queue"
-  description                = "Dados rejeitados ou inconsistentes"
+  friendly_name              = "Gold Layer (Analytics)"
+  description                = "Camada final para Analytics e Dataform"
   location                   = var.region
   delete_contents_on_destroy = true
 }
 
-# --- FIRESTORE (NOSQL) ---
+# --- TABELA EXTERNA: HISTÓRICO (BATCH) ---
+resource "google_bigquery_table" "history_logs" {
+  dataset_id = google_bigquery_dataset.gold_layer.dataset_id
+  table_id   = "history_logs"
+  deletion_protection = false 
 
-resource "google_firestore_database" "database" {
-  name                              = "(default)"
-  location_id                       = "nam5" # Multi-region US (inclui us-central1)
-  type                              = "FIRESTORE_NATIVE"
-  concurrency_mode                  = "OPTIMISTIC"
-  app_engine_integration_mode       = "DISABLED"
-  
-  # Firestore as vezes demora para provisionar
-  depends_on = [google_bigquery_dataset.gold]
+  external_data_configuration {
+    autodetect    = false
+    source_format = "CSV"
+    source_uris   = ["gs://${google_storage_bucket.landing_zone.name}/batch_input/history/*.csv"]
+    
+    csv_options {
+      quote = "\""
+      skip_leading_rows = 1
+    }
+    
+    schema = <<EOF
+[
+  {
+    "name": "sensor_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "temperature",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  }
+]
+EOF
+  }
+}
+
+# --- TABELA EXTERNA: METADADOS ---
+#resource "google_bigquery_table" "sensors_metadata" {
+#  dataset_id = google_bigquery_dataset.gold_layer.dataset_id
+#  table_id   = "sensors_metadata"
+#  deletion_protection = false
+
+#  external_data_configuration {
+#    autodetect    = true 
+#    source_format = "CSV"
+#    source_uris   = ["gs://${google_storage_bucket.landing_zone.name}/batch_input/metadata/*.csv"]
+#    csv_options {
+#      quote = "\""
+#      skip_leading_rows = 1
+#    }
+#  }
+#}
+
+# --- TABELA NATIVA: STREAMING (IOT) ---
+resource "google_bigquery_table" "iot_readings" {
+  dataset_id = google_bigquery_dataset.gold_layer.dataset_id
+  table_id   = "iot_readings"
+  deletion_protection = false
+
+  schema = <<EOF
+[
+  {
+    "name": "sensor_id",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "temperature",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "humidity",
+    "type": "FLOAT64",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "timestamp",
+    "type": "TIMESTAMP",
+    "mode": "NULLABLE"
+  }
+]
+EOF
 }
 
 # --- DATAPLEX (GOVERNANÇA) ---
-
-resource "google_dataplex_lake" "main_lake" {
-  name         = "logistics-lake"
-  location     = var.region
-  display_name = "Logistics Data Lake"
-  
-  labels = {
-    env = "free-tier-lab"
-  }
+resource "google_dataplex_lake" "logistics_lake" {
+  name     = "logistics-lake"
+  location = var.region
 }
 
 resource "google_dataplex_zone" "raw_zone" {
   name         = "raw-zone"
+  lake         = google_dataplex_lake.logistics_lake.name
   location     = var.region
-  lake         = google_dataplex_lake.main_lake.name
   type         = "RAW"
+  
   discovery_spec {
     enabled = true
   }
@@ -83,4 +131,27 @@ resource "google_dataplex_zone" "raw_zone" {
   resource_spec {
     location_type = "SINGLE_REGION"
   }
+}
+
+resource "google_dataplex_asset" "landing_zone_asset" {
+  name          = "landing-zone-asset"
+  lake          = google_dataplex_lake.logistics_lake.name
+  dataplex_zone = google_dataplex_zone.raw_zone.name
+  location      = var.region
+
+  discovery_spec {
+    enabled = true
+  }
+
+  resource_spec {
+    name = "projects/${var.project_id}/buckets/${google_storage_bucket.landing_zone.name}"
+    type = "STORAGE_BUCKET"
+  }
+}
+
+# --- DATAFORM (TRANSFORMAÇÃO) ---
+resource "google_dataform_repository" "transformation_repo" {
+  provider = google-beta
+  name     = "iot-transformations"
+  region   = var.region
 }
