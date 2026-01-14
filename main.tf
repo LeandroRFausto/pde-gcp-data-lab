@@ -155,3 +155,44 @@ resource "google_dataform_repository" "transformation_repo" {
   name     = "iot-transformations"
   region   = var.region
 }
+
+
+
+
+
+
+# --- Datasets que faltavam ---
+
+resource "google_bigquery_dataset" "raw_zone" {
+  dataset_id  = "raw_zone"
+  project     = var.project_id
+  location    = var.region
+  description = "Camada Raw: Dados brutos (CSV, JSON)"
+}
+
+resource "google_bigquery_dataset" "sensor_dw" {
+  dataset_id  = "sensor_dw"
+  project     = var.project_id
+  location    = var.region
+  description = "Camada DW: Dados de streaming e tabelas unificadas"
+}
+
+# --- Tabela Externa (Agora vai funcionar) ---
+
+resource "google_bigquery_table" "batch_readings" {
+  dataset_id = google_bigquery_dataset.raw_zone.dataset_id
+  table_id   = "batch_readings"
+  project    = var.project_id
+  
+  deletion_protection = false
+
+  external_data_configuration {
+    autodetect    = true
+    source_format = "CSV"
+    source_uris = [
+      "gs://${var.project_id}-raw-data/readings/*.csv"
+    ]
+  }
+}
+
+
