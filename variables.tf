@@ -7,3 +7,9 @@ variable "region" {
   type        = string
   default     = "us-central1"
 }
+
+variable "enable_composer" {
+  type    = bool
+  default = false
+}
+
