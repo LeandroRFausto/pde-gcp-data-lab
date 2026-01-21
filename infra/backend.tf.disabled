@@ -1,0 +1,6 @@
+terraform {
+  backend "gcs" {
+    bucket = "SEU_BUCKET_DE_TFSTATE_AQUI"
+    prefix = "lab-gcp/infra"
+  }
+}

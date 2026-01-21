@@ -1,20 +1,76 @@
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.backup
-*.tfvars
-.terraform.lock.hcl
+# Terraform local files
+**/.terraform/*
+**/.terraform.lock.hcl
 
+# State files (nunca versionar)
+**/*.tfstate
+**/*.tfstate.*
+**/terraform.tfstate
+**/terraform.tfstate.backup
+
+# Crash logs
+**/crash.log
+**/crash.*.log
+
+# Local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# tfvars (geralmente contem dados do projeto)
+*.tfvars
+*.tfvars.json
+
+# CLI config
+.terraformrc
+terraform.rc
+
+# dados temporarios
+data/local/**
+
+############################
 # Python
+############################
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
 
-# Credenciais e Chaves
+############################
+# Airflow
+############################
+airflow.db
+logs/
+dags/__pycache__/
+
+############################
+# Spark / Data Engineering
+############################
+*.parquet
+*.avro
+*.orc
+
+############################
+# GCP / Secrets
+############################
+.env
+*.key
+*.pem
 *.json
-!dataform.json
-!workflow_settings.yaml
-!package.json
 
-# IDE / Sistema
+# EXCEÇÃO: se você tiver JSON de schema ou config pública
+!schemas/**/*.json
+!config/**/*.json
+
+############################
+# OS / Editor
+############################
 .DS_Store
 .vscode/
+.idea/
+
+

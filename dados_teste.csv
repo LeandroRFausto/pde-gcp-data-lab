@@ -1,3 +1,0 @@
-sensor_id,temperature,timestamp,source_type
-s1,25.5,2024-01-01 10:00:00,batch
-s2,26.0,2024-01-01 10:05:00,batch
