@@ -195,8 +195,8 @@ gcp-data-engineering-lab/
 ```
 Dados locais, estado do Terraform e artefatos temporários são ignorados por design.
 
-🔁 Data Ingestion
-📦 Batch Pipeline
+## 🔁 Data Ingestion
+## 📦 Batch Pipeline
 Geração de dados históricos em CSV
 Upload para GCS Landing Zone (efêmera)
 Processamento via Dataproc (Spark):
@@ -205,7 +205,7 @@ validação
 escrita em Parquet particionado
 Persistência na RAW Zone
 
-📡 Streaming Pipeline
+## 📡 Streaming Pipeline
 Simulação de dispositivos IoT
 Publicação em Pub/Sub
 Processamento via Dataflow (Apache Beam):
@@ -216,7 +216,7 @@ Semântica aplicada:
 at-least-once no streaming
 deduplicação garantida na camada GOLD
 
-🧠 Orchestration (Airflow / Cloud Composer)
+## 🧠 Orchestration (Airflow / Cloud Composer)
 A DAG 03_end_to_end_diagram coordena o fluxo end-to-end:
 Aguarda arquivos na Landing Zone
 Executa Spark em Dataproc efêmero
@@ -230,7 +230,7 @@ Execuções limpas e controladas
 <br/>
 
 
-🗄️ Data Warehouse (BigQuery)
+## 🗄️ Data Warehouse (BigQuery)
 O BigQuery atua como single source of truth, organizado em camadas:
 RAW: dados brutos batch + streaming
 DW: modelo canônico (fatos e dimensões)
@@ -240,7 +240,7 @@ Transformações declarativas e versionadas via Dataform.
 <br/>
 
 
-🏛️ Data Governance (Dataplex)
+## 🏛️ Data Governance (Dataplex)
 Lake: main-lake
 Zones: RAW, CURATED (DW), CURATED (GOLD)
 Assets: GCS e BigQuery
@@ -254,7 +254,7 @@ Governança visível, auditável e desacoplada do pipeline.
 <br/>
 
 
-📊 BI (Looker Studio)
+## 📊 BI (Looker Studio)
 Dashboards consomem diretamente a camada GOLD, sem SQL para o usuário final.
 Inclui:
 visão geral de temperatura
@@ -264,7 +264,7 @@ anomalias detectadas
 <br/>
 
 
-🤖 Machine Learning (Vertex AI)
+## 🤖 Machine Learning (Vertex AI)
 Uso do Vertex AI Workbench
 Extração de dados da camada GOLD
 Anomaly Detection baseado em Z-score global
@@ -273,7 +273,7 @@ Decisão consciente:
 foco em explicabilidade
 base sólida para evolução futura
 
-🧪 Validations Performed
+## 🧪 Validations Performed
 Contagem consistente entre camadas
 Deduplicação correta
 Partições coerentes
@@ -282,7 +282,7 @@ Batch e streaming coexistindo
 DLQ funcional
 Governança visível no Dataplex
 
-🏁 Conclusion
+## 🏁 Conclusion
 Este projeto entrega:
 ✅ Pipeline real e end-to-end
 ✅ Batch + Streaming integrados
