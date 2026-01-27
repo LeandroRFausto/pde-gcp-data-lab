@@ -19,6 +19,11 @@ O foco está na **qualidade arquitetural**, **boas práticas** e **decisões con
 - **State / Observability (dev):** Firestore  
 - **Infrastructure as Code:** Terraform  
 
+## 🔎 Solution Overview
+
+Os dados batch são gerados localmente em arquivos CSV e enviados para uma GCS Landing Zone efêmera, onde a chegada dos arquivos é detectada pelo Cloud Composer (Airflow), que orquestra a criação de um cluster Dataproc temporário para executar jobs Spark responsáveis pela normalização, validação e escrita dos dados em Parquet particionado, persistido na GCS Raw Zone e exposto no BigQuery por meio de external tables na camada RAW. Em paralelo, os dados streaming simulam eventos de dispositivos IoT publicados no Pub/Sub, processados em tempo quase real pelo Dataflow (Apache Beam), que valida mensagens, aplica schema e grava eventos válidos em BigQuery streaming tables, enquanto direciona mensagens inválidas para um DLQ em BigQuery e mantém estado recente em Firestore para observabilidade durante o desenvolvimento. 
+Independentemente da origem, os dados convergem na camada RAW, sendo transformados de forma declarativa pelo Dataform em um Data Warehouse canônico (fatos e dimensões) e posteriormente consolidados na camada GOLD, que serve tanto para consumo analítico via Looker Studio quanto para Machine Learning no Vertex AI Workbench, onde um modelo simples e explicável de detecção de anomalias (Z-score) é aplicado e seus resultados são escritos de volta no BigQuery, fechando o ciclo analítico. A governança de dados é aplicada de forma transversal e não intrusiva por meio do Dataplex, organizando os ativos em lakes e zones (RAW, DW e GOLD) e enriquecendo-os com metadados de camada, ownership, SLA e sensibilidade.
+
 ---
 
 ## 🧱 Architecture Overview
@@ -206,27 +211,30 @@ escrita em Parquet particionado
 Persistência na RAW Zone
 
 ## 📡 Streaming Pipeline
-Simulação de dispositivos IoT
-Publicação em Pub/Sub
-Processamento via Dataflow (Apache Beam):
-escrita em BigQuery (streaming table)
-escrita em DLQ (BigQuery)
+- Simulação de dispositivos IoT
+- Publicação em Pub/Sub
+- Processamento via Dataflow (Apache Beam):
+escrita em BigQuery (streaming table);
+escrita em DLQ (BigQuery);
 escrita em Firestore como state store (dev)
-Semântica aplicada:
-at-least-once no streaming
+- Semântica aplicada:
+at-least-once no streaming e
 deduplicação garantida na camada GOLD
 
 ## 🧠 Orchestration (Airflow / Cloud Composer)
-A DAG 03_end_to_end_diagram coordena o fluxo end-to-end:
-Aguarda arquivos na Landing Zone
-Executa Spark em Dataproc efêmero
-Remove o cluster após execução (otimização de custo)
-Dispara transformações analíticas via Dataform
-Características:
+- A DAG 03_end_to_end_diagram coordena o fluxo end-to-end:
+- Aguarda arquivos na Landing Zone
+- Executa Spark em Dataproc efêmero
+- Remove o cluster após execução (otimização de custo)
+- Dispara transformações analíticas via Dataform
+- Características:
 DAG idempotente
 Infra não persistente
-Execuções limpas e controladas
-<p align="center"> <img src="docs/architecture/airflow.png" alt="Airflow DAG - End-to-End Pipeline" width="900"/> </p>
+Execuções limpas e controladas.
+<br/>
+
+airflow_dag_end_to_end:
+<p align="center"> <img src="docs/architecture/airflow_dag_end_to_end.png" alt="Airflow DAG - End-to-End Pipeline" width="900"/> </p>
 <br/>
 
 
@@ -236,7 +244,10 @@ RAW: dados brutos batch + streaming
 DW: modelo canônico (fatos e dimensões)
 GOLD: dados consolidados para consumo
 Transformações declarativas e versionadas via Dataform.
-<p align="center"> <img src="docs/architecture/bigquery.png" alt="BigQuery Datasets and Tables" width="900"/> </p>
+<br/>
+
+bigquery_anomaly_detection_table:
+<p align="center"> <img src="docs/architecture/bigquery_anomaly_detection_table.png" alt="BigQuery Datasets and Tables" width="900"/> </p>
 <br/>
 
 
@@ -250,7 +261,10 @@ owner
 sla_horas
 sensitivity
 Governança visível, auditável e desacoplada do pipeline.
-<p align="center"> <img src="docs/architecture/dataplex.png" alt="Dataplex Governance" width="900"/> </p>
+<br/>
+
+dataplex_lake_zones_assets:
+<p align="center"> <img src="docs/architecture/dataplex_lake_zones_assets.png" alt="Dataplex Governance" width="900"/> </p>
 <br/>
 
 
@@ -260,7 +274,10 @@ Inclui:
 visão geral de temperatura
 tendências temporais
 anomalias detectadas
-<p align="center"> <img src="docs/architecture/looker.png" alt="Looker Studio Dashboards" width="900"/> </p>
+<br/>
+
+looker_studio_dashboards:
+<p align="center"> <img src="docs/architecture/looker_studio_dashboards.png" alt="Looker Studio Dashboards" width="900"/> </p>
 <br/>
 
 
