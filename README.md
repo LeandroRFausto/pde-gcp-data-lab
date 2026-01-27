@@ -24,7 +24,7 @@ O foco está na **qualidade arquitetural**, **boas práticas** e **decisões con
 ## 🧱 Architecture Overview
 
 <p align="center">
-  <img src="docs/architecture/architecture_overview.svg"
+  <img src="docs/architecture/architecture_overview.png"
        alt="GCP Data Engineering Architecture"
        width="900"/>
 </p>
