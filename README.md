@@ -7,6 +7,18 @@ Este projeto implementa um **pipeline de dados moderno e escalável**, cobrindo 
 
 O foco está na **qualidade arquitetural**, **boas práticas** e **decisões conscientes**, consolidadas durante a preparação e obtenção da certificação **Google Professional Data Engineer**.
 
+## 🧰 Tech Stack (GCP)
+
+- **Storage & Analytics:** Cloud Storage (GCS), BigQuery  
+- **Batch Processing:** Dataproc (Apache Spark)  
+- **Streaming:** Pub/Sub, Dataflow (Apache Beam)  
+- **Orchestration:** Cloud Composer (Airflow)  
+- **Transformations:** Dataform  
+- **Governance:** Dataplex (lakes, zones, tags)  
+- **Machine Learning:** Vertex AI Workbench  
+- **State / Observability (dev):** Firestore  
+- **Infrastructure as Code:** Terraform  
+
 ---
 
 ## 🧱 Architecture Overview
