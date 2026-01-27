@@ -1,14 +1,21 @@
 ############################
 # Terraform
 ############################
-**/.terraform/**
-**/.terraform.lock.hcl
+
+# Cache local do Terraform (NUNCA versionar)
+.terraform/
+**/.terraform/
 
 # State files (NUNCA versionar)
-**/*.tfstate
-**/*.tfstate.*
-**/terraform.tfstate
-**/terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+
+# Plan files (artefato local)
+tfplan
+tfplan.*
+*.tfplan
 
 # Overrides locais
 override.tf
@@ -25,18 +32,28 @@ override.tf.json
 terraform.rc
 
 ############################
+# Backups / rascunhos antigos
+############################
+
+# Backup antigo de Terraform (fora do escopo do portfólio)
+terraform/
+
+############################
 # Dados locais / temporários
 ############################
+
 data/local/**
 
 ############################
 # Python
 ############################
+
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
+# Ambientes virtuais (NUNCA versionar)
 .venv/
 venv/
 env/
@@ -44,6 +61,7 @@ env/
 ############################
 # Airflow
 ############################
+
 airflow.db
 logs/
 dags/__pycache__/
@@ -51,6 +69,7 @@ dags/__pycache__/
 ############################
 # Spark / Data Engineering
 ############################
+
 *.parquet
 *.avro
 *.orc
@@ -58,6 +77,7 @@ dags/__pycache__/
 ############################
 # GCP / Secrets / Credenciais
 ############################
+
 .env
 *.key
 *.pem
@@ -68,16 +88,16 @@ dags/__pycache__/
 *sa*.json
 
 ############################
-# JSON PÚBLICO (permitido)
+# JSON público NÃO versionado neste projeto
 ############################
-# ⚠️ NÃO ignorar JSON globalmente
-# Se existir JSON público (schema/config), ele deve ser versionado
-!schemas/**/*.json
-!config/**/*.json
+
+# Arquivo pontual não essencial ao portfólio
+table_def.json
 
 ############################
 # OS / Editor
 ############################
+
 .DS_Store
 .vscode/
 .idea/

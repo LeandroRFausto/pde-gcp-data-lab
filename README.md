@@ -22,6 +22,7 @@ O foco está na **qualidade arquitetural**, **boas práticas** e **decisões con
 ## 🔎 Solution Overview
 
 Os dados batch são gerados localmente em arquivos CSV e enviados para uma GCS Landing Zone efêmera, onde a chegada dos arquivos é detectada pelo Cloud Composer (Airflow), que orquestra a criação de um cluster Dataproc temporário para executar jobs Spark responsáveis pela normalização, validação e escrita dos dados em Parquet particionado, persistido na GCS Raw Zone e exposto no BigQuery por meio de external tables na camada RAW. Em paralelo, os dados streaming simulam eventos de dispositivos IoT publicados no Pub/Sub, processados em tempo quase real pelo Dataflow (Apache Beam), que valida mensagens, aplica schema e grava eventos válidos em BigQuery streaming tables, enquanto direciona mensagens inválidas para um DLQ em BigQuery e mantém estado recente em Firestore para observabilidade durante o desenvolvimento. 
+<br/>
 Independentemente da origem, os dados convergem na camada RAW, sendo transformados de forma declarativa pelo Dataform em um Data Warehouse canônico (fatos e dimensões) e posteriormente consolidados na camada GOLD, que serve tanto para consumo analítico via Looker Studio quanto para Machine Learning no Vertex AI Workbench, onde um modelo simples e explicável de detecção de anomalias (Z-score) é aplicado e seus resultados são escritos de volta no BigQuery, fechando o ciclo analítico. A governança de dados é aplicada de forma transversal e não intrusiva por meio do Dataplex, organizando os ativos em lakes e zones (RAW, DW e GOLD) e enriquecendo-os com metadados de camada, ownership, SLA e sensibilidade.
 
 ---
@@ -159,6 +160,16 @@ ZGold --> Gold
 Tags --> ZRaw & ZDW & ZGold
 ```
 </details> 
+
+## 🔍 Observability & Logging
+
+- O pipeline é instrumentado com logs e mecanismos de observabilidade para garantir confiabilidade, rastreabilidade e facilidade de depuração ao longo de todo o fluxo.
+- Airflow (Cloud Composer): logs por task, controle de retries e visibilidade completa da orquestração batch
+- Dataflow: logs estruturados e roteamento de mensagens inválidas para DLQ, permitindo análise e reprocessamento seguro
+- BigQuery: isolamento de erros por meio de tabelas de DLQ, evitando impacto nos dados analíticos
+- Firestore (dev): inspeção de estado e payloads durante o desenvolvimento do pipeline de streaming
+
+Esses mecanismos suportam monitoramento contínuo, troubleshooting eficiente e reprocessamentos controlados, reforçando a robustez do pipeline em cenários reais de produção.
 
 
 ## 📂 Repository Structure
