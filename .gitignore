@@ -1,32 +1,32 @@
-# Terraform local files
-**/.terraform/*
+############################
+# Terraform
+############################
+**/.terraform/**
 **/.terraform.lock.hcl
 
-# State files (nunca versionar)
+# State files (NUNCA versionar)
 **/*.tfstate
 **/*.tfstate.*
 **/terraform.tfstate
 **/terraform.tfstate.backup
 
-# Crash logs
-**/crash.log
-**/crash.*.log
-
-# Local override files
+# Overrides locais
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
 
-# tfvars (geralmente contem dados do projeto)
+# tfvars (podem conter project_id, region, etc.)
 *.tfvars
 *.tfvars.json
 
-# CLI config
+# Terraform CLI config
 .terraformrc
 terraform.rc
 
-# dados temporarios
+############################
+# Dados locais / temporários
+############################
 data/local/**
 
 ############################
@@ -36,6 +36,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
 .venv/
 venv/
 env/
@@ -55,14 +56,22 @@ dags/__pycache__/
 *.orc
 
 ############################
-# GCP / Secrets
+# GCP / Secrets / Credenciais
 ############################
 .env
 *.key
 *.pem
-*.json
 
-# EXCEÇÃO: se você tiver JSON de schema ou config pública
+# Service Accounts / Credenciais (JSON sensível)
+*service-account*.json
+*credentials*.json
+*sa*.json
+
+############################
+# JSON PÚBLICO (permitido)
+############################
+# ⚠️ NÃO ignorar JSON globalmente
+# Se existir JSON público (schema/config), ele deve ser versionado
 !schemas/**/*.json
 !config/**/*.json
 
@@ -72,5 +81,3 @@ dags/__pycache__/
 .DS_Store
 .vscode/
 .idea/
-
-

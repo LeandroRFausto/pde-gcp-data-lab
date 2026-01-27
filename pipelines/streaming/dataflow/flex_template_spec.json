@@ -1,0 +1,19 @@
+{
+  "image": "gcr.io/quick-cache-484111-j4/iot-streaming:latest",
+  "sdk_info": { "language": "PYTHON" },
+  "metadata": {
+    "name": "iot-streaming",
+    "description": "Streaming Pub/Sub -> BigQuery with optional Firestore and DLQ",
+    "parameters": [
+      {"name":"input_topic","label":"Input Pub/Sub topic","helpText":"projects/<project>/topics/<topic>"},
+      {"name":"output_table","label":"BigQuery output table","helpText":"project:dataset.table"},
+      {"name":"project_id","label":"Project ID","helpText":"GCP project id for Firestore"},
+      {"name":"project","label":"Project","helpText":"GCP project for Dataflow"},
+      {"name":"region","label":"Region","helpText":"Dataflow region"},
+      {"name":"enable_firestore","label":"Enable Firestore","helpText":"Enable writes to Firestore","is_optional":true},
+      {"name":"firestore_collection","label":"Firestore collection","helpText":"Firestore collection name","is_optional":true},
+      {"name":"deadletter_path","label":"Deadletter path","helpText":"gs://bucket/prefix","is_optional":true},
+      {"name":"deadletter_window_sec","label":"DLQ window sec","helpText":"Window seconds","is_optional":true}
+    ]
+  }
+}

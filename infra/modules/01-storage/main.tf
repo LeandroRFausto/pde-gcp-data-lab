@@ -171,7 +171,7 @@ resource "google_dataplex_asset" "raw_bucket" {
   dataplex_zone = google_dataplex_zone.raw_zone.name
 
   discovery_spec {
-    enabled = false
+    enabled = true
   }
 
   resource_spec {

@@ -1,0 +1,14 @@
+{
+  "autodetect": true,
+  "csvOptions": {
+    "encoding": "UTF-8",
+    "nullMarkers": [],
+    "preserveAsciiControlCharacters": false,
+    "quote": "\""
+  },
+  "sourceFormat": "CSV",
+  "sourceUris": [
+    "gs://quick-cache-484111-j4-raw-data/readings/*.csv"
+  ],
+  "timestampTargetPrecision": []
+}

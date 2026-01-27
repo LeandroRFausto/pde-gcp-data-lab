@@ -1,0 +1,74 @@
+{
+  "name": "iot-streaming-pubsub-to-bq-with-dlq",
+  "description": "Streaming pipeline: Pub/Sub → BigQuery (raw) + DLQ (BigQuery + optional GCS) + optional Firestore. DLQ to GCS uses windowing to be streaming-safe.",
+  "parameters": [
+    {
+      "name": "input_topic",
+      "label": "Input Pub/Sub Topic",
+      "helpText": "Pub/Sub topic to read from. Format: projects/<project>/topics/<topic>",
+      "paramType": "TEXT",
+      "isOptional": false
+    },
+    {
+      "name": "output_table",
+      "label": "BigQuery Output Table (Raw)",
+      "helpText": "BigQuery table for valid events. Format: project:dataset.table",
+      "paramType": "TEXT",
+      "isOptional": false
+    },
+    {
+      "name": "dlq_table",
+      "label": "BigQuery DLQ Table",
+      "helpText": "BigQuery table for dead-letter records. Format: project:dataset.table",
+      "paramType": "TEXT",
+      "isOptional": false
+    },
+    {
+      "name": "project_id",
+      "label": "GCP Project ID",
+      "helpText": "Project ID used by Firestore client.",
+      "paramType": "TEXT",
+      "isOptional": false
+    },
+    {
+      "name": "enable_firestore",
+      "label": "Enable Firestore Sink",
+      "helpText": "Whether to write latest sensor state to Firestore. Use true or false.",
+      "paramType": "TEXT",
+      "isOptional": true,
+      "defaultValue": "false"
+    },
+    {
+      "name": "firestore_collection",
+      "label": "Firestore Collection",
+      "helpText": "Firestore collection name for sensor state.",
+      "paramType": "TEXT",
+      "isOptional": true,
+      "defaultValue": "sensors"
+    },
+    {
+      "name": "deadletter_path",
+      "label": "GCS DLQ File Prefix (optional)",
+      "helpText": "GCS file prefix for DLQ files (JSONL). Example: gs://<bucket>/dataflow/dlq/iot_readings_dlq . Leave empty to disable GCS DLQ.",
+      "paramType": "TEXT",
+      "isOptional": true,
+      "defaultValue": ""
+    },
+    {
+      "name": "deadletter_window_sec",
+      "label": "DLQ GCS Window Size (seconds)",
+      "helpText": "Fixed window size in seconds for DLQ files written to GCS.",
+      "paramType": "NUMBER",
+      "isOptional": true,
+      "defaultValue": "60"
+    },
+    {
+      "name": "deadletter_trigger_sec",
+      "label": "DLQ GCS Trigger Delay (seconds)",
+      "helpText": "Processing-time trigger delay (seconds) for emitting DLQ files to GCS.",
+      "paramType": "NUMBER",
+      "isOptional": true,
+      "defaultValue": "30"
+    }
+  ]
+}
