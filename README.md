@@ -192,6 +192,7 @@ gcp-data-engineering-lab/
 │
 ├─ requirements.txt
 └─ .gitignore
+```
 Dados locais, estado do Terraform e artefatos temporários são ignorados por design.
 
 🔁 Data Ingestion
