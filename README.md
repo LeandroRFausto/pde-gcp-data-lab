@@ -222,19 +222,23 @@ Aguarda arquivos na Landing Zone
 Executa Spark em Dataproc efêmero
 Remove o cluster após execução (otimização de custo)
 Dispara transformações analíticas via Dataform
-<p align="center"> <img src="docs/architecture/airflow.png" alt="Airflow DAG - End-to-End Pipeline" width="900"/> </p>
 Características:
 DAG idempotente
 Infra não persistente
 Execuções limpas e controladas
+<p align="center"> <img src="docs/architecture/airflow.png" alt="Airflow DAG - End-to-End Pipeline" width="900"/> </p>
+<br/>
+
 
 🗄️ Data Warehouse (BigQuery)
 O BigQuery atua como single source of truth, organizado em camadas:
 RAW: dados brutos batch + streaming
 DW: modelo canônico (fatos e dimensões)
 GOLD: dados consolidados para consumo
-<p align="center"> <img src="docs/architecture/bigquery.png" alt="BigQuery Datasets and Tables" width="900"/> </p>
 Transformações declarativas e versionadas via Dataform.
+<p align="center"> <img src="docs/architecture/bigquery.png" alt="BigQuery Datasets and Tables" width="900"/> </p>
+<br/>
+
 
 🏛️ Data Governance (Dataplex)
 Lake: main-lake
@@ -245,16 +249,20 @@ layer
 owner
 sla_horas
 sensitivity
-<p align="center"> <img src="docs/architecture/dataplex.png" alt="Dataplex Governance" width="900"/> </p>
 Governança visível, auditável e desacoplada do pipeline.
+<p align="center"> <img src="docs/architecture/dataplex.png" alt="Dataplex Governance" width="900"/> </p>
+<br/>
+
 
 📊 BI (Looker Studio)
 Dashboards consomem diretamente a camada GOLD, sem SQL para o usuário final.
-<p align="center"> <img src="docs/architecture/looker.png" alt="Looker Studio Dashboards" width="900"/> </p>
 Inclui:
 visão geral de temperatura
 tendências temporais
 anomalias detectadas
+<p align="center"> <img src="docs/architecture/looker.png" alt="Looker Studio Dashboards" width="900"/> </p>
+<br/>
+
 
 🤖 Machine Learning (Vertex AI)
 Uso do Vertex AI Workbench
