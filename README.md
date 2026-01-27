@@ -195,7 +195,7 @@ gcp-data-engineering-lab/
 ```
 Dados locais, estado do Terraform e artefatos temporários são ignorados por design.
 
-## 🔁 Data Ingestion
+# 🔁 Data Ingestion
 ## 📦 Batch Pipeline
 Geração de dados históricos em CSV
 Upload para GCS Landing Zone (efêmera)
@@ -284,11 +284,13 @@ Governança visível no Dataplex
 
 ## 🏁 Conclusion
 Este projeto entrega:
-✅ Pipeline real e end-to-end
-✅ Batch + Streaming integrados
-✅ Governança aplicada corretamente
-✅ BI e ML fechando o ciclo
-✅ Infraestrutura desacoplada e escalável
-✅ Portfólio tecnicamente defendível em entrevista
+
+- ✅ Pipeline real e end-to-end  
+- ✅ Batch + Streaming integrados  
+- ✅ Governança aplicada corretamente  
+- ✅ BI e ML fechando o ciclo  
+- ✅ Infraestrutura desacoplada e escalável  
+- ✅ Portfólio técnico 
+
 
 Arquitetura completa de engenharia de dados, com decisões explícitas e trade-offs conscientes.
